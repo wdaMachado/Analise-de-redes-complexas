@@ -1,10 +1,10 @@
 import pandas as pd
-from grafo1 import Grafo_ponderado
+from grafo1 import Grafo_ponderado, gerar_dot
 
 grafo = Grafo_ponderado()
 
 
-df = pd.read_csv("data.csv")
+df = pd.read_csv("shortened_data.csv")
 with open("diretor-ator.txt", "w") as arq:
     for index, linha in df.iterrows():
         diretores   = linha['director']
@@ -31,4 +31,7 @@ n_vertices  = grafo.quant_vertices()
 n_arestas   = grafo.quant_arestas()
 
 print(f"Nodes: {n_vertices}\nArestas: {n_arestas} \n---------------------")
-grafo.show_grafo("TIM ROONEY")
+grafo.show_grafo("ABHISHEK BANERJEE")
+print(f"DFS:      {grafo.dfs('ABHISHEK BANERJEE')}")
+
+gerar_dot(grafo.conexoes)
