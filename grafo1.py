@@ -6,6 +6,9 @@ class Grafo_ponderado:
         self.vertices = []
         self.conexoes = {}
     
+    def grafo(self):
+        return self.conexoes
+
     def show_grafo(self, vertice = None):
         if vertice:
             return print(self.conexoes[vertice])
@@ -37,37 +40,7 @@ class Grafo_ponderado:
             else:
                 self.conexoes[vertice][adj] = self.conexoes[vertice][adj]+1
 
-    def dfs(self, source_node):
-        visited = []
-        stack   = []
-        visited_finished = {} #Estrutura {'vertice' : {'visited' : {finalizado} }} Ainda em implementacao
-        i = 1
-        stack.append(source_node)
-        while len(stack) > 0:
-            current_node = stack.pop()
-
-            if current_node not in visited:
-                visited.append(current_node)
-                visited_finished[current_node] = {}
-                visited_finished[current_node][i] = np.inf
-                
-                for adj in sorted(self.conexoes[current_node], reverse=True):
-                    if adj not in visited:
-                        stack.append(adj)  
-                adj
-
-            i+=1 
-        return visited
-
-    def transpose(self): #inverte cada uma das conexoes do grafo
-        transposto = {}
-        for ator, diretores in self.conexoes.items(): 
-            for diretor in diretores:
-                if diretor not in transposto:
-                    transposto[diretor] = {}
-                transposto[diretor][ator] = self.conexoes[ator][diretor]
-                
-        return transposto
+    
     
 
 ##Funcao para gerar uma imagem do grafo facilitando o entendimento
@@ -82,6 +55,56 @@ def gerar_dot(grafo, nome_arquivo="grafo.dot", direcionado=True):
                 f.write(f'    "{origem}" {ligacao} "{destino}" [label="{peso}"];\n')
         f.write("}\n")
 
+def dfs(grafo, source_node):
+    stack = []
+    visiting = set()
+    finished = set()
+    visited_finished = {}  # {'nó': {'start': tempo_inicio, 'end': tempo_fim}}
+
+    time = 1
+    stack.append((source_node, False))  # (nó, expandido?)
+    while len(grafo) > len(finished):
+        if len(stack) == 0:
+            for node in grafo:
+                if node not in visited_finished and node not in visiting and node not in finished:
+                    stack.append((node, False))
+                if len(stack) > 0:
+                    break 
+        while stack:
+            current_node, expanded = stack.pop()
+
+            if not expanded:
+                if current_node not in visited_finished:
+                    visiting.add(current_node)
+                    visited_finished[current_node] = {'start': time, 'end': None}
+                    time += 1
+
+                    # Reempilha o nó para ser finalizado depois
+                    stack.append((current_node, True))
+
+                    # 🔧 MELHORIA 1: empilha apenas nós ainda não visitados
+                    if grafo[current_node]:
+                        for adj in sorted(grafo[current_node], reverse=True):
+                            if adj not in visited_finished and adj not in visiting and adj not in finished:
+                                stack.append((adj, False))
+
+            else:
+                visiting.remove(current_node)
+                finished.add(current_node)
+                visited_finished[current_node]['end'] = time
+                time += 1
+
+    return visited_finished
+
+def transpose(grafo): #inverte cada uma das conexoes do grafo
+        transposto = {}
+        for ator, diretores in grafo.items(): 
+            for diretor in diretores:
+                if diretor not in transposto:
+                    transposto[diretor] = {}
+                transposto[diretor][ator] = grafo[ator][diretor]
+                
+        return transposto
 teste = Grafo_ponderado()
 teste.add_vertice("A")
 teste.add_vertice("B")
@@ -106,10 +129,14 @@ teste.add_conexao("B", "F")
 teste.add_conexao("B", "E")
 teste.add_conexao("B", "C")
 
-teste.show_grafo()
-print(teste.dfs("C"))
+#teste.show_grafo()
 
-gerar_dot(teste.conexoes)
-transposto = teste.transpose()
-gerar_dot(transposto, "grafo_transposto.dot")
+gerar_dot(teste.grafo())
+dfs1 = dfs(teste.grafo(), "C")
+dfs1 = {Vertice: time for Vertice, time in sorted(dfs1.items(), key=lambda item: item[1]['end'], reverse=True)}
+transposto = transpose(teste.grafo())
+gerar_dot(transposto)
+dfs2 = dfs(transposto, list(dfs1.keys())[0])
+print(dfs1)
+print(dfs2)
 

@@ -1,0 +1,16 @@
+digraph G {
+    "B" -> "A" [label="1"];
+    "F" -> "B" [label="1"];
+    "F" -> "E" [label="1"];
+    "F" -> "G" [label="1"];
+    "E" -> "B" [label="1"];
+    "C" -> "B" [label="1"];
+    "C" -> "D" [label="1"];
+    "D" -> "C" [label="1"];
+    "G" -> "C" [label="1"];
+    "G" -> "F" [label="1"];
+    "H" -> "D" [label="1"];
+    "H" -> "G" [label="1"];
+    "A" -> "E" [label="1"];
+}
+ 
