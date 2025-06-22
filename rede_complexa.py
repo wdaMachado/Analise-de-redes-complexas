@@ -1,11 +1,11 @@
 import pandas as pd
-from grafo1 import Grafo_ponderado, gerar_dot
+from grafo1 import *
 
 grafo = Grafo_ponderado()
 
 
-df = pd.read_csv("shortened_data.csv")
-with open("diretor-ator.txt", "w") as arq:
+df = pd.read_csv("data.csv")
+with open("diretor-ator.txt", "w", encoding='utf-8') as arq:
     for index, linha in df.iterrows():
         diretores   = linha['director']
         atores      = linha['cast']
@@ -29,9 +29,28 @@ with open("diretor-ator.txt", "w") as arq:
 
 n_vertices  = grafo.quant_vertices()
 n_arestas   = grafo.quant_arestas()
-
 print(f"Nodes: {n_vertices}\nArestas: {n_arestas} \n---------------------")
-grafo.show_grafo("ABHISHEK BANERJEE")
-print(f"DFS:      {grafo.dfs('ABHISHEK BANERJEE')}")
 
-gerar_dot(grafo.conexoes)
+grafo.show_grafo("JAMES FRANCO")
+# (grupo, dfs1) = dfs(grafo.grafo())
+# print(f"DFS: {grupo}")
+# gerar_dot(grafo.grafo())
+
+
+####### Testes de centralidade
+# centralidade_grau = centralidade_grau(grafo.grafo(), "LAWRENCE KOH")
+# print(f"Centralidade de grau: {centralidade_grau}")
+
+# centr_proximidade = centralidade_proximidade(grafo.grafo(), "ABHISHEK BANERJEE")
+# print(f"Centralidade de proximidade: {centr_proximidade}")
+
+# centralidades = centralidade_intermediacao(grafo.grafo(), "ABHISHEK BANERJEE")
+# print(f"Centralidade de intermediação de ABHISHEK BANERJEE: {centralidades:.20f}")
+
+centralidades = centralidade_intermediacao(grafo.grafo())
+
+top10 = sorted(centralidades.items(), key=lambda x: x[1], reverse=True)[:10] ## Já retorna os 10 diretores com maior centralidade
+for v, c in top10:
+    print(f"{v}: {c:.10f}")
+
+
